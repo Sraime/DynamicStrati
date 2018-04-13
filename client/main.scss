@@ -1,0 +1,35 @@
+@import '{}/node_modules/bootstrap/scss/bootstrap.scss';
+
+#list-us {
+  list-style: none;
+  padding: 0;
+  .card {
+    margin-bottom: 20px;
+    .card-header{
+      text-align: center;
+    }
+  }
+}
+
+header {
+  position: fixed;
+  width: 100%;
+  z-index: 10;
+}
+
+#form-us {
+  background: cadetblue;
+  padding: 10px;
+}
+
+#form-rel-us {
+  background: lightblue;
+  padding: 10px;
+ select {
+   width: 200px;
+ }
+}
+
+.container {
+  padding-top: 300px;
+}
