@@ -20,9 +20,32 @@ Meteor.startup(() => {
       },
       'US.update.synchro.add'({id1, id2}) {
         if(id1 === id2)
-          throw new Meteor.Error("invalid params","Impossible de créer une relation récursive.")
-        if(US.estSynchrone(id1,id2))
-          throw new Meteor.Error("incorrect","Ces USs sont déjà synchrones")
+          throw new Meteor.Error("invalid params","ERREUR : Impossible de créer une relation récursive.");
+        let path = US.estSynchrone(id1,id2);
+        if(path.length > 0){
+          let strPath = "";
+          for(var i = 0; i < path.length; i++)
+            strPath += path[i].name ? "("+path[i].name+")" : "-[synchrone]-";
+          throw new Meteor.Error("incorrect","ERREUR : Ces US sont synchrones => "+strPath);
+        }
+        path = US.estAnterieure(id2,id1);
+        path = path.length > 0 ? path : US.estAnterieure(id1,id2);
+        if(path.length > 0){
+          let strPath = "";
+          let lastUsName = "";
+          for(var i = 0; i < path.length; i++){
+            if(i === 0)
+              strPath = "("+path[i].name+")";
+            else if(i === path.length-1 && lastUsName !== path[i].name)
+              strPath += "-[synchrone]-("+path[i].name+")";
+            else if(path[i].from) {
+              strPath += path[i].from == lastUsName ? "" : "-[synchrone]-("+path[i].from+")";
+              strPath += "-[anterieure]->("+path[i].to+")";
+            }
+            lastUsName = path[i].name ? path[i].name : path[i].to ? path[i].to : lastUsName;
+          }
+          throw new Meteor.Error("incorrect","ERREUR : "+path[0].name + " est antérieure à " + path[path.length-1].name+" => "+strPath )
+        }
         US.addUsSynchro(id1,id2);
         AnyDb.refresh('UScreate', (refreshData) => {
           return refreshData;
@@ -36,13 +59,32 @@ Meteor.startup(() => {
       },
       'US.update.ant.add'({id1, id2}) {
         if(id1 === id2)
-          throw new Meteor.Error("invalid params","Impossible de créer une relation récursive.")
-        let path;
-        if(US.estSynchrone(id1,id2))
-          throw new Meteor.Error("incorrect","Ces USs sont synchrones")
+          throw new Meteor.Error("invalid params","ERREUR : Impossible de créer une relation récursive.")
+        let path = US.estSynchrone(id1,id2);
+        if(path.length > 0){
+          let strPath = "";
+          for(var i = 0; i < path.length; i++)
+            strPath += path[i].name ? "("+path[i].name+")" : "-[synchrone]-";
+          throw new Meteor.Error("incorrect","ERREUR : Ces US sont synchrones => "+strPath)
+        }
         path = US.estAnterieure(id2,id1)
-        if(path.length > 0)
-          throw new Meteor.Error("incorrect",path[0].name + " est postérieure à " + path[path.length-1].name )
+        if(path.length > 0){
+          let strPath = "";
+          let lastUsName = "";
+          for(var i = 0; i < path.length; i++){
+            if(i === 0)
+              strPath = "("+path[i].name+")";
+            else if(i === path.length-1 && lastUsName !== path[i].name)
+              strPath += "-[synchrone]-("+path[i].name+")";
+            else if(path[i].from) {
+              strPath += path[i].from == lastUsName ? "" : "-[synchrone]-("+path[i].from+")";
+              strPath += "-[anterieure]->("+path[i].to+")";
+            }
+            lastUsName = path[i].name ? path[i].name : path[i].to ? path[i].to : lastUsName;
+          }
+          throw new Meteor.Error("incorrect","ERREUR : "+path[0].name + " est antérieure à " + path[path.length-1].name+" => "+strPath )
+        }
+
         US.addUsAnt(id1,id2,US.estAnterieure(id1,id2,1));
         AnyDb.refresh('UScreate', (refreshData) => {
           return refreshData;

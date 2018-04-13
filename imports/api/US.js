@@ -12,8 +12,8 @@ export let US = {
                 "OPTIONAL MATCH (n)-[:EST_SYNCHRONE]-(s:US) "+
                 "OPTIONAL MATCH (n)<-[:EST_ANTERIEURE]-(a:US) "+
                 "OPTIONAL MATCH (n)-[:EST_ANTERIEURE]->(p:US) "+
-                "WITH n," +
-                " collect(DISTINCT{_id: id(s), name: s.name}) as syncs, " +
+                "WITH n, " +
+                "collect(DISTINCT{_id: id(s), name: s.name}) as syncs, " +
                 "collect(DISTINCT{_id: id(a), name: a.name}) as ants, " +
                 "collect(DISTINCT{_id: id(p), name: p.name}) as posts "+
                 "RETURN {_id: id(n), name: n.name, syncs: syncs, ants: ants, posts: posts} ORDER BY n.name"
@@ -111,18 +111,19 @@ export let US = {
   },
 
   estAnterieure(id1, id2, bagDepth = null) {
-    let query = "MATCH path = (u1:"+LABEL+")<--(b1:Bag)-[:"+REL_EST_ANTERIEURE+"*"+(bagDepth ? ".."+bagDepth : "")+"]-(b2:Bag)-->(u2:"+LABEL+") "+
+    let query = "MATCH (u1:"+LABEL+")<--(b1:Bag), (u2:"+LABEL+")<--(b2:Bag), " +
+                  "path = shortestPath((b1)-[:"+REL_EST_ANTERIEURE+"*"+(bagDepth ? ".."+bagDepth : "")+"]->(b2)) "+
                 "WHERE id(u1) = "+id1+" AND id(u2) = "+id2+" " +
-                "RETURN path";
+                "RETURN u1+relationships(path)+u2";
     console.log(query);
     return Neo4j.query(query);
   },
 
   estSynchrone(id1, id2) {
-    let query = "MATCH path = (u1:"+LABEL+")-[:"+REL_EST_SYNCHRONE+"*]-(u1:"+LABEL+") "+
+    let query = "MATCH path = (u1:"+LABEL+")-[:"+REL_EST_SYNCHRONE+"*]-(u2:"+LABEL+") "+
       "WHERE id(u1) = "+id1+" AND id(u2) = "+id2+" " +
       "RETURN path";
     console.log(query);
-    return Neo4j.query(query).length > 0;
+    return Neo4j.query(query);
   }
 }

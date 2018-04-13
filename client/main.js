@@ -14,11 +14,14 @@ let subUs = AnyDb.subscribe('UScreate', [], (sub) => {
 const refreshUsList = (data) => {
   let jsx = renderUs(data);
   ReactDOM.render(jsx, document.getElementById('list-us'));
-  let dataSelect = data.map((us) => { return {id: us._id, text: us.name}});
-  console.log("refresh list with : ", dataSelect)
-  $(".select2-us").html(null).select2(
-    {data: dataSelect, width: 200}
-  );
+  let fromUs = $("#select2-us1");
+  let toUs = $("#select2-us2");
+  let fromUsVal = fromUs.val();
+  let toUsVal = toUs.val();
+  fromUs.html(null).select2(
+    {data: data.map((us) => { return {id: us._id, text: us.name, selected: us._id == fromUsVal}}), width: 200});
+  toUs.html(null).select2(
+    {data: data.map((us) => { return {id: us._id, text: us.name, selected: us._id == toUsVal}}), width: 200});
 }
 
 const renderUsAsListItem = (uss) => {
