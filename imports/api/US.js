@@ -97,16 +97,16 @@ export let US = {
 
   addUsAnt(id1,id2, bagLink = true) {
     let query = "MATCH (u1:"+LABEL+")<--(b1:Bag),(u2:"+LABEL+")<--(b2:Bag) " +
-      "WHERE id(u1) = "+id1+" AND id(u2) = "+id2+ " " +
-      "MERGE (u1)-[:"+REL_EST_ANTERIEURE+"]->(u2) " +
-      "MERGE (b1)-[:"+REL_EST_ANTERIEURE+" {from: u1.name, to: u2.name}]->(b2) ";
+                "WHERE id(u1) = "+id1+" AND id(u2) = "+id2+ " " +
+                "MERGE (u1)-[:"+REL_EST_ANTERIEURE+"]->(u2) " +
+                "MERGE (b1)-[:"+REL_EST_ANTERIEURE+" {from: u1.name, to: u2.name}]->(b2) ";
     console.log(query)
     Neo4j.query(query)
   },
 
   deleteUsAnt(id1,id2) {
     let query = "MATCH (u1:"+LABEL+")-[r:"+REL_EST_ANTERIEURE+"]->(u2:"+LABEL+")<--(:Bag)<-[br:"+REL_EST_ANTERIEURE+" {from: u1.name, to: u2.name}]-(:Bag)" +
-      "WHERE id(u1) = "+id1+" AND id(u2) = "+id2+" DELETE r,br";
+                "WHERE id(u1) = "+id1+" AND id(u2) = "+id2+" DELETE r,br";
     Neo4j.query(query)
   },
 
@@ -121,8 +121,8 @@ export let US = {
 
   estSynchrone(id1, id2) {
     let query = "MATCH path = (u1:"+LABEL+")-[:"+REL_EST_SYNCHRONE+"*]-(u2:"+LABEL+") "+
-      "WHERE id(u1) = "+id1+" AND id(u2) = "+id2+" " +
-      "RETURN path";
+                "WHERE id(u1) = "+id1+" AND id(u2) = "+id2+" " +
+                "RETURN path";
     console.log(query);
     return Neo4j.query(query);
   }
