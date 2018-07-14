@@ -3,7 +3,11 @@ import ReactDOM from 'react-dom';
 import {Meteor} from 'meteor/meteor';
 import { AnyDb } from 'meteor/ccorcos:any-db'
 
-let subUs = AnyDb.subscribe('UScreate', [], (sub) => {
+/**
+ * Souscription au évènements serveur sur la modification des US (création, suppression, liens)
+ * Mise à jour du front à chaque appel
+ */
+let subUs = AnyDb.subscribe('UsEvents', [], (sub) => {
   refreshUsList(sub.data);
   sub.onChange( (data) => {
       refreshUsList(data);
@@ -11,9 +15,14 @@ let subUs = AnyDb.subscribe('UScreate', [], (sub) => {
   }
 )
 
+/**
+ * Mise à jour des cadres US et des listes déroulantes
+ * @param data
+ */
 const refreshUsList = (data) => {
   let jsx = renderUs(data);
   ReactDOM.render(jsx, document.getElementById('list-us'));
+
   let fromUs = $("#select2-us1");
   let toUs = $("#select2-us2");
   let fromUsVal = fromUs.val();
@@ -24,11 +33,10 @@ const refreshUsList = (data) => {
     {data: data.map((us) => { return {id: us._id, text: us.name, selected: us._id == toUsVal}}), width: 200});
 }
 
-const renderUsAsListItem = (uss) => {
-  return uss.filter((us) => us._id != null).map( (us) => {
-    return <li key={us._id}>{us.name}</li>
-  })
-}
+/**
+ * Génération HTML du cadre de chaque US
+ * @param uslist : liste des US incluant leurs relations
+ */
 const renderUs= (uslist) => {
 
   return uslist.map((us) => {
@@ -82,6 +90,20 @@ const renderUs= (uslist) => {
   });
 };
 
+/**
+ * Génération HTML d'une liste d'US
+ * @param uss
+ */
+const renderUsAsListItem = (uss) => {
+  return uss.filter((us) => us._id != null).map( (us) => {
+    return <li key={us._id}>{us.name}</li>
+  })
+}
+
+/**
+ * Evènement (formulaire) de création d'une US
+ * @param e : event
+ */
 const handleSubmit = (e) => {
   let usName = e.target.usName.value;
 
@@ -94,6 +116,10 @@ const handleSubmit = (e) => {
   }
 };
 
+/**
+ * Evènement (formulaire) de création/suppression d'une relation entre US
+ * @param e : event
+ */
 const handleSubmitRel = (e) => {
   let id1 = e.target.relus1.value;
   let id2 = e.target.relus2.value;
@@ -111,6 +137,9 @@ const handleSubmitRel = (e) => {
 
 };
 
+/**
+ * Initialisation de la page
+ */
 Meteor.startup(() => {
   let jsx = (
     <div>

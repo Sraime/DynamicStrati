@@ -12,12 +12,16 @@ Meteor.startup(() => {
           return refreshData;
         })
       },
+
+
       'US.delete'({id}){
         US.delete(id);
         AnyDb.refresh('UScreate',(refreshData) => {
           return refreshData;
         })
       },
+
+
       'US.update.synchro.add'({id1, id2}) {
         if(id1 === id2)
           throw new Meteor.Error("invalid params","ERREUR : Impossible de créer une relation récursive.");
@@ -48,6 +52,8 @@ Meteor.startup(() => {
           return refreshData;
         })
       },
+
+
       'US.update.synchro.delete'({id1, id2}) {
         if(id1 === id2 || US.estSynchrone(id1,id2).length === 0)
           throw new Meteor.Error("invalid params","Ces US ne sont pas synchrones");
@@ -56,6 +62,8 @@ Meteor.startup(() => {
           return refreshData;
         })
       },
+
+
       'US.update.ant.add'({id1, id2}) {
         if(id1 === id2)
           throw new Meteor.Error("invalid params","ERREUR : Impossible de créer une relation récursive.");
@@ -81,11 +89,13 @@ Meteor.startup(() => {
           throw new Meteor.Error("incorrect","ERREUR : "+path[0].name + " est antérieure à " + path[path.length-1].name+" => "+strPath )
         }
 
-        US.addUsAnt(id1,id2,US.estAnterieure(id1,id2,1));
+        US.addUsAnt(id1,id2);
         AnyDb.refresh('UScreate', (refreshData) => {
           return refreshData;
         })
       },
+
+
       'US.update.ant.delete'({id1, id2}) {
         if(id1 === id2 || US.estAnterieure(id1,id2,1).length === 0)
           throw new Meteor.Error("invalid params","Ces US ne sont pas antérieures");
@@ -97,7 +107,7 @@ Meteor.startup(() => {
     }
   )
 
-  AnyDb.publish('UScreate', (query) => {
+  AnyDb.publish('UsEvents', (query) => {
     return US.relationnalFindAll();
   })
 });
