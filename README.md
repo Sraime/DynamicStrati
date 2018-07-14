@@ -1,4 +1,4 @@
-##Dynamic Strati
+## Dynamic Strati
 
 Cette application est une expérimentation menée dans le cadre 
 d'un projet de recherhce sur la détection d'incohérences 
@@ -13,7 +13,7 @@ L'objetif de cette nouvelle version est de proposer un
 controle de cohérence dynamique, c'est à dire dès la saisie 
 de nouvelles données.
   
-##Installation
+## Installation
 
 Pour faire fonctionner l'application il vous faut avoir
 au préalable :
@@ -28,7 +28,7 @@ via votre invite de commande et exécuter :
 meteor run
 ```
 
-##Licence
+## Licence
 
 MIT
 
