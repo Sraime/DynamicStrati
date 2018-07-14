@@ -8,7 +8,7 @@ Meteor.startup(() => {
     {
       'US.create'({name}){
         US.create(name);
-        AnyDb.refresh('UScreate',(refreshData) => {
+        AnyDb.refresh('UsEvents',(refreshData) => {
           return refreshData;
         })
       },
@@ -16,7 +16,7 @@ Meteor.startup(() => {
 
       'US.delete'({id}){
         US.delete(id);
-        AnyDb.refresh('UScreate',(refreshData) => {
+        AnyDb.refresh('UsEvents',(refreshData) => {
           return refreshData;
         })
       },
@@ -48,7 +48,7 @@ Meteor.startup(() => {
           throw new Meteor.Error("incorrect","ERREUR : "+path[0].name + " est antérieure à " + path[path.length-1].name+" => "+strPath )
         }
         US.addUsSynchro(id1,id2);
-        AnyDb.refresh('UScreate', (refreshData) => {
+        AnyDb.refresh('UsEvents', (refreshData) => {
           return refreshData;
         })
       },
@@ -58,7 +58,7 @@ Meteor.startup(() => {
         if(id1 === id2 || US.estSynchrone(id1,id2).length === 0)
           throw new Meteor.Error("invalid params","Ces US ne sont pas synchrones");
         US.exitSynchro(id1);
-        AnyDb.refresh('UScreate', (refreshData) => {
+        AnyDb.refresh('UsEvents', (refreshData) => {
           return refreshData;
         })
       },
@@ -90,7 +90,7 @@ Meteor.startup(() => {
         }
 
         US.addUsAnt(id1,id2);
-        AnyDb.refresh('UScreate', (refreshData) => {
+        AnyDb.refresh('UsEvents', (refreshData) => {
           return refreshData;
         })
       },
@@ -100,7 +100,7 @@ Meteor.startup(() => {
         if(id1 === id2 || US.estAnterieure(id1,id2,1).length === 0)
           throw new Meteor.Error("invalid params","Ces US ne sont pas antérieures");
         US.deleteUsAnt(id1,id2);
-        AnyDb.refresh('UScreate', (refreshData) => {
+        AnyDb.refresh('UsEvents', (refreshData) => {
           return refreshData;
         })
       }
