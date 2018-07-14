@@ -23,10 +23,7 @@ Meteor.startup(() => {
           throw new Meteor.Error("invalid params","ERREUR : Impossible de créer une relation récursive.");
         let path = US.estSynchrone(id1,id2);
         if(path.length > 0){
-          let strPath = "";
-          for(var i = 0; i < path.length; i++)
-            strPath += path[i].name ? "("+path[i].name+")" : "-[synchrone]-";
-          throw new Meteor.Error("incorrect","ERREUR : Ces US sont synchrones => "+strPath);
+          throw new Meteor.Error("incorrect","ERREUR : Ces US sont du même ensemble synchrone");
         }
         path = US.estAnterieure(id2,id1);
         path = path.length > 0 ? path : US.estAnterieure(id1,id2);
@@ -52,20 +49,19 @@ Meteor.startup(() => {
         })
       },
       'US.update.synchro.delete'({id1, id2}) {
-        US.deleteUsSynchro(id1,id2);
+        if(id1 === id2 || US.estSynchrone(id1,id2).length === 0)
+          throw new Meteor.Error("invalid params","Ces US ne sont pas synchrones");
+        US.exitSynchro(id1);
         AnyDb.refresh('UScreate', (refreshData) => {
           return refreshData;
         })
       },
       'US.update.ant.add'({id1, id2}) {
         if(id1 === id2)
-          throw new Meteor.Error("invalid params","ERREUR : Impossible de créer une relation récursive.")
+          throw new Meteor.Error("invalid params","ERREUR : Impossible de créer une relation récursive.");
         let path = US.estSynchrone(id1,id2);
         if(path.length > 0){
-          let strPath = "";
-          for(var i = 0; i < path.length; i++)
-            strPath += path[i].name ? "("+path[i].name+")" : "-[synchrone]-";
-          throw new Meteor.Error("incorrect","ERREUR : Ces US sont synchrones => "+strPath)
+          throw new Meteor.Error("incorrect","ERREUR : Ces US sont du même ensemble synchrone");
         }
         path = US.estAnterieure(id2,id1)
         if(path.length > 0){
@@ -91,6 +87,8 @@ Meteor.startup(() => {
         })
       },
       'US.update.ant.delete'({id1, id2}) {
+        if(id1 === id2 || US.estAnterieure(id1,id2,1).length === 0)
+          throw new Meteor.Error("invalid params","Ces US ne sont pas antérieures");
         US.deleteUsAnt(id1,id2);
         AnyDb.refresh('UScreate', (refreshData) => {
           return refreshData;

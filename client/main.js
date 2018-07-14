@@ -103,6 +103,7 @@ const handleSubmitRel = (e) => {
     let payload = {id1: id1, id2: id2}
     let remoteAction = 'US.update.'+e.target.reltype.value+"."+e.target.relaction.value;
     Meteor.call(remoteAction, payload, (err,res) => {
+      console.log(err)
       let flashMessage = <div className={err ? "alert alert-danger" : "alert alert-success"} role="alert">{err ? err.reason : "Success"}</div>
       ReactDOM.render(flashMessage, document.getElementById('form-rel-flash'));
     })
