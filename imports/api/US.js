@@ -1,7 +1,7 @@
 import {Neo4j, Stringifier} from '../drivers/neo4j'
 
 // Unité Stratigraphique
-const US_LABEL = "US";
+const US_LABEL = "UniteStrati";
 
 
 // lien d'antériorité entre deux US
@@ -21,10 +21,10 @@ export let US = {
    * Répère tous les relations explicité et implicite (synchrones, antérieures, postérieures) de degré 1 de chaque US
    */
   relationnalFindAll(){
-    let query = "MATCH (n:US) "+
-                "OPTIONAL MATCH (n)<--(b:"+BAG_LABEL+")-->(s:US) "+
-                "OPTIONAL MATCH (n)<-[:"+REL_EST_ANTERIEURE+"]-(a:US) "+
-                "OPTIONAL MATCH (n)-[:"+REL_EST_ANTERIEURE+"]->(p:US) "+
+    let query = "MATCH (n:"+US_LABEL+") "+
+                "OPTIONAL MATCH (n)<--(b:"+BAG_LABEL+")-->(s:"+US_LABEL+") "+
+                "OPTIONAL MATCH (n)<-[:"+REL_EST_ANTERIEURE+"]-(a:"+US_LABEL+") "+
+                "OPTIONAL MATCH (n)-[:"+REL_EST_ANTERIEURE+"]->(p:"+US_LABEL+") "+
                 "WITH n, " +
                 "collect(DISTINCT{_id: id(s), name: s.name}) as syncs, " +
                 "collect(DISTINCT{_id: id(a), name: a.name}) as ants, " +
@@ -83,12 +83,12 @@ export let US = {
                 "FOREACH (us in luss1| MERGE (b2)-[:"+REL_INCLUDE+"]->(us)) " +
                 "DETACH DELETE b1 " +
                 "WITH b2 as nb " +
-                "OPTIONAL MATCH (nb)-->(usto:US)<-[:"+REL_EST_ANTERIEURE+"]-(usfrom:US)<--(bfrom:"+BAG_LABEL+") " +
+                "OPTIONAL MATCH (nb)-->(usto:"+US_LABEL+")<-[:"+REL_EST_ANTERIEURE+"]-(usfrom:"+US_LABEL+")<--(bfrom:"+BAG_LABEL+") " +
                 "WITH nb, bfrom, collect({ut: usto, uf: usfrom}) as cus " +
                 "WITH nb, bfrom, filter(x IN cus WHERE x.ut IS NOT NULL) as nrel " +
                 "FOREACH (r IN nrel | MERGE (nb)<-[:"+REL_EST_ANTERIEURE+" {from: r.uf.name, to: r.ut.name}]-(bfrom) ) " +
                 "WITH nb " +
-                "OPTIONAL MATCH (nb)-->(usfrom:US)-[:"+REL_EST_ANTERIEURE+"]->(usto:US)<--(bto:"+BAG_LABEL+") " +
+                "OPTIONAL MATCH (nb)-->(usfrom:"+US_LABEL+")-[:"+REL_EST_ANTERIEURE+"]->(usto:"+US_LABEL+")<--(bto:"+BAG_LABEL+") " +
                 "WITH nb, bto, collect({uf: usfrom, ut: usto}) as cus " +
                 "WITH nb, bto, filter(x IN cus WHERE x.ut IS NOT NULL) as nrel " +
                 "FOREACH (r IN nrel | MERGE (nb)-[:"+REL_EST_ANTERIEURE+" {from: r.uf.name, to: r.ut.name}]->(bto) ) " ;
@@ -112,12 +112,12 @@ export let US = {
                 "DELETE r, ant, post " +
                 "CREATE (u)<-[:"+REL_INCLUDE+"]-(nb:"+BAG_LABEL+") " +
                 "WITH nb " +
-                "OPTIONAL MATCH (nb)-->(usto:US)<-[:"+REL_EST_ANTERIEURE+"]-(usfrom:US)<--(bfrom:"+BAG_LABEL+") " +
+                "OPTIONAL MATCH (nb)-->(usto:"+US_LABEL+")<-[:"+REL_EST_ANTERIEURE+"]-(usfrom:"+US_LABEL+")<--(bfrom:"+BAG_LABEL+") " +
                 "WITH nb, bfrom, collect({ut: usto, uf: usfrom}) as cus " +
                 "WITH nb, bfrom, filter(x IN cus WHERE x.ut IS NOT NULL) as nrel " +
                 "FOREACH (r IN nrel | MERGE (nb)<-[:"+REL_EST_ANTERIEURE+" {from: r.uf.name, to: r.ut.name}]-(bfrom) ) " +
                 "WITH nb " +
-                "OPTIONAL MATCH (nb)-->(usfrom:US)-[:"+REL_EST_ANTERIEURE+"]->(usto:US)<--(bto:"+BAG_LABEL+") " +
+                "OPTIONAL MATCH (nb)-->(usfrom:"+US_LABEL+")-[:"+REL_EST_ANTERIEURE+"]->(usto:"+US_LABEL+")<--(bto:"+BAG_LABEL+") " +
                 "WITH nb, bto, collect({uf: usfrom, ut: usto}) as cus " +
                 "WITH nb, bto, filter(x IN cus WHERE x.ut IS NOT NULL) as nrel " +
                 "FOREACH (r IN nrel | MERGE (nb)-[:"+REL_EST_ANTERIEURE+" {from: r.uf.name, to: r.ut.name}]->(bto) ) " ;
